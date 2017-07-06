@@ -28,41 +28,6 @@ app.get('/baby', (req, res) => {
     });
 });
 
-//select
-// app.get('/user', (req, res) => {
-//     var pool = new sql.ConnectionPool(config, err => {
-//         var request = pool.request();
-
-//         request.execute('Artist_SelectAll',
-//             (err, result, returnValue) => {
-//                 res.status(200).json(result.recordset);
-//             });
-//     });
-// });
-
-// select status latest (babyid, seconds)
-app.get('/status/:babyid', (req, res) => {
-    var pool = new sql.ConnectionPool(config, err => {
-        var request = pool.request();
-
-        var babyid = req.params.babyid;
-        var seconds = 30;
-
-        request.input('BabyId', sql.NVarChar, babyid);
-        request.input('seconds', sql.Int, seconds);
-
-        request.execute('select_status_latest',
-            (err, result, returnValue) => {
-                if (result = null)
-                    res.status(404).json({
-                        Error: `latest data does not exist.`
-                    });
-                else
-                    res.status(200).json(result.recordset);
-            });
-    });
-});
-
 // select baby
 app.get('/baby/:babyid&:password', (req, res) => {
     var pool = new sql.ConnectionPool(config, err => {
@@ -86,26 +51,28 @@ app.get('/baby/:babyid&:password', (req, res) => {
     });
 });
 
-// select id
-// app.get('/user/:id', (req, res) => {
-//     var pool = new sql.ConnectionPool(config, err => {
-//         var request = pool.request();
+// select status latest (babyid, seconds)
+app.get('/status/:babyid', (req, res) => {
+    var pool = new sql.ConnectionPool(config, err => {
+        var request = pool.request();
 
-//         var id = req.params.id;
+        var babyid = req.params.babyid;
+        var seconds = 30;
 
-//         request.input('ArtistId', sql.Int, id);
+        request.input('BabyId', sql.NVarChar, babyid);
+        request.input('seconds', sql.Int, seconds);
 
-//         request.execute('Artist_SelectById',
-//             (err, result, returnValue) => {
-//                 if (result.rowsAffected == 0)
-//                     res.status(404).json({
-//                         Error: `id ${id} does not exist,`
-//                     });
-//                 else
-//                     res.status(200).json(result.recordset);
-//             });
-//     });
-// });
+        request.execute('select_status_latest',
+            (err, result, returnValue) => {
+                if (result = null)
+                    res.status(404).json({
+                        Error: `latest data does not exist.`
+                    });
+                else
+                    res.status(200).json(result.recordset);
+            });
+    });
+});
 
 // insert baby
 app.post('/baby', (req, res) => {
@@ -157,70 +124,6 @@ app.post('/status', (req, res) => {
     });
 })
 
-
-// insert
-// app.post('/user', (req, res) => {
-//     var pool = new sql.ConnectionPool(config, err => {
-//         var request = pool.request();
-
-//         var name = req.body.name;
-//         request.input('Name', sql.NVarChar, name);
-
-//         request.execute('Artist_Insert',
-//             (err, result, returnValue) => {
-//                 if (result.rowsAffected == 0)
-//                     res.status(500).json({
-//                         Error: `failed to insert ${name}`
-//                     });
-//                 else
-//                     res.status(200).json(result.recordset);
-//             });
-//     });
-// })
-
-//update
-// app.put('/user/:id', (req, res) => {
-//     var pool = new sql.ConnectionPool(config, err => {
-//         var request = pool.request();
-
-//         var id = req.params.id;
-//         var name = req.body.name;
-
-//         request.input('ArtistId', sql.Int, id);
-//         request.input('Name', sql.NVarChar, name);
-
-//         request.execute('Artist_Update',
-//             (err, result, returnValue) => {
-//                 if (result.rowsAffected == 0)
-//                     res.status(500).json({
-//                         Error: `failed to update ${name}`
-//                     });
-//                 else
-//                     res.status(200).json(result.recordset);
-//             });
-//     });
-// })
-
-//delete 
-// app.delete('/user/:id', (req, res) => {
-//     var pool = new sql.ConnectionPool(config, err => {
-//         var request = pool.request();
-
-//         var id = req.params.id;
-
-//         request.input('ArtistId', sql.Int, id);
-
-//         request.execute('Artist_Delete',
-//             (err, result, returnValue) => {
-//                 if (result.rowsAffected == 0)
-//                     res.status(500).json({
-//                         Error: `failed to delete ${id}`
-//                     });
-//                 else
-//                     res.status(200).json(result.recordset);
-//             });
-//     });
-// })
 var port = 3005;
 app.listen(port, () => {
     console.log(`listening on port ${port}`)
