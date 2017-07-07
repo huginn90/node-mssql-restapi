@@ -3,9 +3,9 @@ var bodyParser = require('body-parser');
 var sql = require('mssql');
 
 var config = {
-    server: '10.10.14.78',
+    server: '192.168.78.1',
     database: 'diaper',
-    user: 'sa',
+    user: 'DiaperUser',
     password: '0000',
     port: 1433
 };
@@ -16,7 +16,7 @@ app.use(bodyParser.urlencoded({
     extended: false
 }));
 
-//select baby all
+//select baby all test
 app.get('/baby', (req, res) => {
     var pool = new sql.ConnectionPool(config, err => {
         var request = pool.request();
@@ -28,7 +28,7 @@ app.get('/baby', (req, res) => {
     });
 });
 
-// select baby
+// select baby login
 app.get('/baby/:babyid&:password', (req, res) => {
     var pool = new sql.ConnectionPool(config, err => {
         var request = pool.request();
@@ -51,20 +51,37 @@ app.get('/baby/:babyid&:password', (req, res) => {
     });
 });
 
-// select status latest (babyid, seconds)
+// select babyid only id check
+app.get('/baby/:babyid', (req, res) => {
+    var pool = new sql.ConnectionPool(config, err => {
+        var request = pool.request();
+
+        var babyid = req.params.babyid;
+
+        request.input('babyid', sql.NVarChar, babyid);
+
+        request.execute('Select_BabyId',
+            (err, result, returnValue) => {
+                if (result.recordset.length == 1)
+                    res.status(200).json({count:1});
+                else
+                    res.status(200).json({count:0});
+            });
+    });
+});
+
+// select status latest alram
 app.get('/status/:babyid', (req, res) => {
     var pool = new sql.ConnectionPool(config, err => {
         var request = pool.request();
 
         var babyid = req.params.babyid;
-        var seconds = 30;
 
         request.input('babyid', sql.NVarChar, babyid);
-        request.input('seconds', sql.NVarChar, seconds);
 
         request.execute('select_status_latest',
             (err, result, returnValue) => {
-                if (result.rowsAffected == 0)
+                if (result.recordset.length == 0)
                     res.status(404).json({
                         Error: `id ${babyid} does not exist,`
                     });
@@ -74,7 +91,7 @@ app.get('/status/:babyid', (req, res) => {
     });
 });
 
-// insert baby
+// insert baby 
 app.post('/baby', (req, res) => {
     var pool = new sql.ConnectionPool(config, err => {
         var request = pool.request();
@@ -99,7 +116,7 @@ app.post('/baby', (req, res) => {
     });
 });
 
-// insert status
+// insert status arduino
 app.post('/status', (req, res) => {
     var pool = new sql.ConnectionPool(config, err => {
         var request = pool.request();
