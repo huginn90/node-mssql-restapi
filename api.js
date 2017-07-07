@@ -3,9 +3,9 @@ var bodyParser = require('body-parser');
 var sql = require('mssql');
 
 var config = {
-    server: '192.168.78.1',
+    server: '10.10.14.78',
     database: 'diaper',
-    user: 'DiaperUser',
+    user: 'sa',
     password: '0000',
     port: 1433
 };
@@ -59,14 +59,14 @@ app.get('/status/:babyid', (req, res) => {
         var babyid = req.params.babyid;
         var seconds = 30;
 
-        request.input('BabyId', sql.NVarChar, babyid);
-        request.input('seconds', sql.Int, seconds);
+        request.input('babyid', sql.NVarChar, babyid);
+        request.input('seconds', sql.NVarChar, seconds);
 
         request.execute('select_status_latest',
             (err, result, returnValue) => {
-                if (result = null)
+                if (result.rowsAffected == 0)
                     res.status(404).json({
-                        Error: `latest data does not exist.`
+                        Error: `id ${babyid} does not exist,`
                     });
                 else
                     res.status(200).json(result.recordset);
@@ -82,12 +82,10 @@ app.post('/baby', (req, res) => {
         var babyid = req.body.babyid;
         var password = req.body.password;
         var Name = req.body.Name;
-        var birth = req.body.birth;
 
         request.input('BabyId', sql.NVarChar, babyid);
         request.input('password', sql.NVarChar, password);
         request.input('Name', sql.NVarChar, Name);
-        request.input('birth', sql.Date, birth);
 
         request.execute('Insert_Baby',
             (err, result, returnValue) => {
@@ -99,7 +97,7 @@ app.post('/baby', (req, res) => {
                     res.status(200).json(result.recordset);
             });
     });
-})
+});
 
 // insert status
 app.post('/status', (req, res) => {
@@ -122,7 +120,7 @@ app.post('/status', (req, res) => {
                     res.status(200).json(result.recordset);
             });
     });
-})
+});
 
 var port = 3005;
 app.listen(port, () => {
