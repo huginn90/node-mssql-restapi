@@ -91,6 +91,27 @@ app.get('/status/:babyid', (req, res) => {
     });
 });
 
+// select status latest alram
+app.get('/count/:babyid', (req, res) => {
+    var pool = new sql.ConnectionPool(config, err => {
+        var request = pool.request();
+
+        var babyid = req.params.babyid;
+
+        request.input('babyid', sql.NVarChar, babyid);
+
+        request.execute('select_status_wastecount',
+            (err, result, returnValue) => {
+                if (result.recordset.length == 0)
+                    res.status(404).json({
+                        Error: `id ${babyid} does not exist,`
+                    });
+                else
+                    res.status(200).json(result.recordset);
+            });
+    });
+});
+
 // insert baby 
 app.post('/baby', (req, res) => {
     var pool = new sql.ConnectionPool(config, err => {
@@ -109,6 +130,29 @@ app.post('/baby', (req, res) => {
                 if (result.rowsAffected == 0)
                     res.status(500).json({
                         Error: `failed to insert baby`
+                    });
+                else
+                    res.status(200).json(result.recordset);
+            });
+    });
+});
+
+// insert device
+app.post('/device', (req, res) => {
+    var pool = new sql.ConnectionPool(config, err => {
+        var request = pool.request();
+
+        var babyid = req.body.babyid;
+        var deviceid = req.body.deviceid;
+
+        request.input('deviceid', sql.NVarChar, deviceid);
+        request.input('babyid', sql.NVarChar, babyid);
+
+        request.execute('Insert_Device',
+            (err, result, returnValue) => {
+                if (result.rowsAffected == 0)
+                    res.status(500).json({
+                        Error: `failed to insert device`
                     });
                 else
                     res.status(200).json(result.recordset);
