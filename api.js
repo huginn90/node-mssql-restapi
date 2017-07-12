@@ -63,9 +63,9 @@ app.get('/baby/:babyid', (req, res) => {
         request.execute('Select_BabyId',
             (err, result, returnValue) => {
                 if (result.recordset.length == 1)
-                    res.status(200).json({count:1});
+                    res.status(200).json({count:'1'});
                 else
-                    res.status(200).json({count:0});
+                    res.status(200).json({count:'0'});
             });
     });
 });
@@ -82,8 +82,8 @@ app.get('/status/:babyid', (req, res) => {
         request.execute('select_status_latest',
             (err, result, returnValue) => {
                 if (result.recordset.length == 0)
-                    res.status(404).json({
-                        Error: `id ${babyid} does not exist,`
+                    res.status(200).json({
+                        wasteTime:'0'
                     });
                 else
                     res.status(200).json(result.recordset);
