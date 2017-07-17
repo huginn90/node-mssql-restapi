@@ -1,10 +1,10 @@
 var express = require('express');
 var bodyParser = require('body-parser');
 var sql = require('mssql');
-var auth = require('express-basic-auth');
+var basicAuth = require('basic-auth');
 
 var config = {
-    server: '192.168.78.1',
+    server: '10.10.14.78',
     database: 'diaper',
     user: 'DiaperUser',
     password: '0000',
@@ -16,6 +16,34 @@ var app = express();
 app.use(bodyParser.urlencoded({
     extended: false
 }));
+
+var auth = function (req, res, next) {
+
+    var user = basicAuth(req);
+
+    var pool = new sql.ConnectionPool(config, err => {
+    var request = pool.request();
+
+    request.input('babyid', sql.NVarChar, user.name);
+    request.input('password', sql.NVarChar, user.pass);
+
+    request.execute('Select_Baby',
+        (err, result, returnValue) => {
+            if (result.recordset.length == 1) {
+                res.status(200).json(result.recordset);
+                // next();
+            }
+            else
+               res.status(404).json({
+                        Error: `id ${user.name} does not exist,`
+                });    
+        });
+    });
+}
+
+app.get("/auth", auth, function (req, res) {
+    // res.send("This page is authenticated!")
+});
 
 //select baby all test
 app.get('/baby', (req, res) => {
@@ -83,8 +111,8 @@ app.get('/status/:babyid', (req, res) => {
         request.execute('select_status_latest',
             (err, result, returnValue) => {
                 if (result.recordset.length == 0)
-                    res.status(200).json({
-                        wasteTime:'0'
+                    res.status(404).json({
+                        Error : 'latest data not exist'
                     });
                 else
                     res.status(200).json(result.recordset);
