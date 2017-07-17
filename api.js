@@ -1,6 +1,7 @@
 var express = require('express');
 var bodyParser = require('body-parser');
 var sql = require('mssql');
+var auth = require('express-basic-auth');
 
 var config = {
     server: '192.168.78.1',
@@ -91,7 +92,7 @@ app.get('/status/:babyid', (req, res) => {
     });
 });
 
-// select status latest alram
+// select status count 
 app.get('/count/:babyid', (req, res) => {
     var pool = new sql.ConnectionPool(config, err => {
         var request = pool.request();
