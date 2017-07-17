@@ -41,6 +41,7 @@ var auth = function (req, res, next) {
     });
 }
 
+//login basic auth
 app.get("/auth", auth, function (req, res) {
     // res.send("This page is authenticated!")
 });
